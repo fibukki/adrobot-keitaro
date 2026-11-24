@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }}{% endblock %}
+{% block content %}
+<p><a href="/campaigns">← Campaigns</a></p>
+<h1>{{ campaign.name }} <span class="muted">#{{ campaign.id }}</span></h1>
+<p class="muted">
+  {% if campaign.alias %}alias <code>{{ campaign.alias }}</code> · {% endif %}
+  {% if campaign.state %}state {{ campaign.state }} · {% endif %}
+  <a href="{{ admin_url }}" target="_blank" rel="noopener">open in Keitaro ↗</a>
+</p>
+
+{% for stream in streams %}
+  {% with campaign_id = campaign.id, notice = none %}{% include "partials/stream.html" %}{% endwith %}
+{% else %}
+  <p class="muted">This campaign has no streams.</p>
+{% endfor %}
+{% endblock %}

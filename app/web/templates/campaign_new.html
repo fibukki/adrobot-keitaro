@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Create campaign{% endblock %}
+{% block content %}
+<h1>Create campaign</h1>
+<p class="muted">Creates a campaign with two streams: a country filter redirecting to
+  {{ geo_redirect_url }} and a default stream with the selected offer.</p>
+
+{% if error %}{% with message = error %}{% include "partials/error.html" %}{% endwith %}{% endif %}
+
+<form method="post" action="/campaigns/new" class="card form" id="create-form">
+  <label>Name
+    <input type="text" name="name" value="{{ form.name or '' }}" required maxlength="255">
+  </label>
+
+  <div class="field">
+    <span class="label">Geo</span>
+    <div class="geo-picker">
+      <div class="chips">
+        {% for code in form.geo %}
+          <span class="chip">{{ code }}<input type="hidden" name="geo" value="{{ code }}"><button type="button" class="chip-remove" aria-label="Remove {{ code }}">×</button></span>
+        {% endfor %}
+      </div>
+      <input type="text" class="geo-input" list="countries" autocomplete="off"
+             placeholder="Country code or name, Enter to add (MX, AU, RO…)">
+      <datalist id="countries">
+        {% for code, name in countries.items() %}<option value="{{ code }}">{{ name }}</option>{% endfor %}
+      </datalist>
+    </div>
+  </div>
+
+  <div class="field">
+    <span class="label">Offer</span>
+    {% with offer_id = form.offer_id, label = form.offer_label %}{% include "partials/offer_picker.html" %}{% endwith %}
+    <div>
+      <button type="button" class="link" hx-post="/offers/refresh" hx-target="#refresh-result">Refresh offers list</button>
+      <span id="refresh-result" class="muted small"></span>
+    </div>
+  </div>
+
+  <details {% if error %}open{% endif %}>
+    <summary>Domain, group, traffic source</summary>
+    <label>Domain
+      <select name="domain_id">
+        {% for d in refs.domains %}<option value="{{ d.id }}" {% if d.id|string == form.domain_id|string %}selected{% endif %}>{{ d.name }} (#{{ d.id }})</option>{% endfor %}
+      </select>
+    </label>
+    <label>Campaign group
+      <select name="group_id">
+        {% for g in refs.groups %}<option value="{{ g.id }}" {% if g.id|string == form.group_id|string %}selected{% endif %}>{{ g.name }} (#{{ g.id }})</option>{% endfor %}
+      </select>
+    </label>
+    <label>Traffic source
+      <select name="traffic_source_id">
+        {% for s in refs.traffic_sources %}<option value="{{ s.id }}" {% if s.id|string == form.traffic_source_id|string %}selected{% endif %}>{{ s.name }} (#{{ s.id }})</option>{% endfor %}
+      </select>
+    </label>
+  </details>
+
+  <button type="submit" class="primary">Create</button>
+</form>
+{% endblock %}

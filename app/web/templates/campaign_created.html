@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Campaign created{% endblock %}
+{% block content %}
+<h1>Campaign created</h1>
+<div class="card">
+  <dl class="props">
+    <dt>Name</dt><dd>{{ record.name }} <span class="muted">#{{ record.keitaro_id }}</span></dd>
+    <dt>Geo</dt><dd>{{ record.geo | join(", ") }}</dd>
+    <dt>Campaign URL</dt>
+    <dd>{% if record.url %}<a href="{{ record.url }}" target="_blank" rel="noopener">{{ record.url }}</a>{% else %}<span class="muted">unknown (no alias or domain)</span>{% endif %}</dd>
+    <dt>In Keitaro</dt><dd><a href="{{ admin_url }}" target="_blank" rel="noopener">{{ admin_url }}</a></dd>
+    <dt>Edit offers</dt><dd><a href="/campaigns/{{ record.keitaro_id }}">Open in editor →</a></dd>
+  </dl>
+  {% if ignored %}
+    <div class="alert alert-warn">Keitaro did not apply these campaign settings: {{ ignored | join(", ") }}. Check them in the admin.</div>
+  {% endif %}
+</div>
+<p><a href="/campaigns/new">+ Create another</a></p>
+{% endblock %}

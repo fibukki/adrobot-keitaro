@@ -1,0 +1,7 @@
+{# Offer autocomplete backed by GET /api/offers?q=… (behaviour in static/app.js). #}
+<div class="offer-picker">
+  <input type="text" class="offer-search" name="offer_label" value="{{ label or '' }}"
+         placeholder="Search offer by name or ID" autocomplete="off" aria-label="Offer">
+  <input type="hidden" name="offer_id" value="{{ offer_id or '' }}">
+  <ul class="offer-results" role="listbox" hidden></ul>
+</div>

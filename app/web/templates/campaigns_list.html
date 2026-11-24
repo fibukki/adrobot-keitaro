@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Campaigns{% endblock %}
+{% block content %}
+<h1>Campaigns</h1>
+<form method="get" action="/campaigns" class="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Name or ID">
+  <button type="submit">Search</button>
+  {% if q %}<a href="/campaigns">Reset</a>{% endif %}
+</form>
+
+{% if campaigns %}
+<table class="table">
+  <thead><tr><th>ID</th><th>Name</th><th>Alias</th><th>State</th><th></th></tr></thead>
+  <tbody>
+  {% for c in campaigns %}
+    <tr>
+      <td>{{ c.id }}</td>
+      <td><a href="/campaigns/{{ c.id }}">{{ c.name }}</a>{% if c.id in ours %} <span class="badge" title="Created through this service">ours</span>{% endif %}</td>
+      <td class="muted">{{ c.alias or "" }}</td>
+      <td>{{ c.state or "" }}</td>
+      <td><a href="/campaigns/{{ c.id }}">Edit →</a></td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p class="muted">No campaigns found.</p>
+{% endif %}
+
+{% if not q %}
+<nav class="pager">
+  {% if page > 1 %}<a href="/campaigns?page={{ page - 1 }}">← Newer</a>{% endif %}
+  <span class="muted">Page {{ page }}</span>
+  {% if has_next %}<a href="/campaigns?page={{ page + 1 }}">Older →</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

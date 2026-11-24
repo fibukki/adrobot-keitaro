@@ -1,0 +1,56 @@
+<section class="card stream" id="stream-{{ stream.id }}">
+  <header class="stream-head">
+    <h2>{% if stream.position is not none %}{{ stream.position }}. {% endif %}{{ stream.name or "Untitled stream" }}</h2>
+    {% if stream.type %}<span class="badge">{{ stream.type }}</span>{% endif %}
+    {% if stream.schema_ %}<span class="badge">{{ stream.schema_ }}</span>{% endif %}
+    {% if stream.state and stream.state != "active" %}<span class="badge badge-warn">{{ stream.state }}</span>{% endif %}
+  </header>
+
+  {% if notice %}<div class="alert alert-ok">{{ notice }}</div>{% endif %}
+
+  {% if stream.filters %}
+    <p>Filters:
+      {% for f in stream.filters %}
+        <code>{{ f.name }} {{ f.mode }} {% if f.payload is iterable and f.payload is not string %}{{ f.payload | join(", ") }}{% else %}{{ f.payload }}{% endif %}</code>{% if not loop.last %}, {% endif %}
+      {% endfor %}
+    </p>
+  {% endif %}
+  {% if stream.schema_ == "redirect" %}
+    <p>Redirect ({{ stream.action_type }}): <code>{{ stream.action_payload }}</code></p>
+  {% endif %}
+
+  {% if stream.uses_offers %}
+    <table class="table offers">
+      <thead><tr><th>ID</th><th>Offer</th><th class="num">Share</th><th>State</th><th></th></tr></thead>
+      <tbody>
+      {% for o in stream.offers %}
+        <tr>
+          <td>{{ o.offer_id }}</td>
+          <td>{{ names.get(o.offer_id, "—") }}</td>
+          <td class="num">{{ o.share }}%</td>
+          <td>{{ o.state or "" }}</td>
+          <td>
+            <form hx-post="/campaigns/{{ campaign_id }}/streams/{{ stream.id }}/offers/{{ o.offer_id }}/delete"
+                  hx-target="#stream-{{ stream.id }}" hx-swap="outerHTML"
+                  hx-confirm="Remove offer #{{ o.offer_id }} from this stream?">
+              <button type="submit" class="danger" {% if stream.offers | length < 2 %}disabled title="The last offer of a stream cannot be removed"{% endif %}>Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="5" class="muted">No offers</td></tr>
+      {% endfor %}
+      </tbody>
+      {% if stream.offers %}
+      <tfoot><tr><td></td><td>Total</td><td class="num">{{ stream.offers | sum(attribute="share") }}%</td><td colspan="2"></td></tr></tfoot>
+      {% endif %}
+    </table>
+
+    <form class="add-offer needs-offer" hx-post="/campaigns/{{ campaign_id }}/streams/{{ stream.id }}/offers"
+          hx-target="#stream-{{ stream.id }}" hx-swap="outerHTML">
+      {% with offer_id = none, label = none %}{% include "partials/offer_picker.html" %}{% endwith %}
+      <button type="submit" class="primary">Add offer</button>
+    </form>
+    <p class="muted small">Shares are redistributed evenly after every change.</p>
+  {% endif %}
+</section>
