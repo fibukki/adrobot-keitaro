@@ -22,8 +22,13 @@ class OfferCache(Base):
 
     @property
     def label(self) -> str:
-        """Same format the Keitaro admin uses: `[3749] Offer name`."""
-        return f"[{self.id}] {self.name}"
+        """Same format the Keitaro admin uses: `[3749] Offer name`.
+
+        Offer names on the stand already start with the id (`18001 Detoxin ...`);
+        that duplicate is dropped so the label reads `[18001] Detoxin ...`.
+        """
+        name = self.name.removeprefix(f"{self.id} ")
+        return f"[{self.id}] {name}"
 
 
 class Campaign(Base):
