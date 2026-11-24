@@ -27,8 +27,12 @@ class OfferCache(Base):
         Offer names on the stand already start with the id (`18001 Detoxin ...`);
         that duplicate is dropped so the label reads `[18001] Detoxin ...`.
         """
-        name = self.name.removeprefix(f"{self.id} ")
-        return f"[{self.id}] {name}"
+        return f"[{self.id}] {self.display_name}"
+
+    @property
+    def display_name(self) -> str:
+        """Name without the redundant leading id the stand puts into offer names."""
+        return self.name.removeprefix(f"{self.id} ")
 
 
 class Campaign(Base):

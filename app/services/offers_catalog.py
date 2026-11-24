@@ -92,10 +92,8 @@ class OffersCatalog:
         if not ids:
             return {}
         await self.ensure_fresh()
-        rows = await self._session.execute(
-            select(OfferCache.id, OfferCache.name).where(OfferCache.id.in_(ids))
-        )
-        return {offer_id: name for offer_id, name in rows}
+        offers = await self._session.scalars(select(OfferCache).where(OfferCache.id.in_(ids)))
+        return {offer.id: offer.display_name for offer in offers}
 
 
 def _escape_like(value: str) -> str:

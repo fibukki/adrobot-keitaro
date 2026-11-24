@@ -75,5 +75,8 @@ async def test_refresh_replaces_snapshot(offers, session, keitaro) -> None:
 
 
 async def test_names(offers, mock_offers) -> None:
-    assert await offers.names([18001, 999]) == {18001: "Keto Slim [DIET-MX]"}
+    assert await offers.names([18001, 18004, 999]) == {
+        18001: "Keto Slim [DIET-MX]",
+        18004: "Hepatix [PROSTATE-DE] [quiz de -] ADNOVA v3",
+    }
     assert await offers.names([]) == {}
